@@ -10,19 +10,19 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
-public class CadastroUsuario extends ActionBarActivity {
+public class LoginUsuario extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cadastro_usuario);
+        setContentView(R.layout.activity_login_usuario);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_cadastro_usuario, menu);
+        getMenuInflater().inflate(R.menu.menu_login_usuario, menu);
         return true;
     }
 
@@ -41,33 +41,29 @@ public class CadastroUsuario extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-    public boolean EmailValido(String email) {
 
-        return email.contains("@");
+    public void cadastrar(View v) {
+        Intent it = new Intent(this, CadastroUsuario.class);
+        startActivity(it);
     }
 
-    public boolean SenhaValida(String password) {
-
-        return password.length() > 8;
-    }
-*/
-    public void cadastraUsuario (View v){
-        DbHelper Helper = new DbHelper(this);
+    public void entrar(View v) {
 
         EditText email = (EditText) findViewById(R.id.email);
         EditText password = (EditText) findViewById(R.id.password);
         EditText whatsapp = (EditText) findViewById(R.id.whatsapp);
-
         Usuario user = new Usuario(email.getText().toString(), password.getText().toString(), whatsapp.getText().toString());
 
+        // verifica se o usuário está no BD
 
+        if(!Global.usuarios.isEmpty() && Global.usuarios.contains(user)) {
 
-        // INSERE O USUARIO NO BANCO DE DADOS
+            Intent it = new Intent(this, TelaPrincipal.class);
+            startActivity(it);
+        }else {
+            Toast.makeText(this, "Nenhum usuário encontrado!", Toast.LENGTH_SHORT).show();
+        }
 
-        Helper.insertUsuario(user);
-        Global.usuarios.add(user);
-        Intent i = new Intent(this, LoginUsuario.class);
-        startActivity(i);
     }
+
 }
