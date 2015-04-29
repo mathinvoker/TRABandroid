@@ -1,8 +1,5 @@
 package com.praticas.matheus.easyride;
 
-/**
- * Created by Matheus on 28/04/2015.
- */
 public class Usuario {
 
     private String email;
