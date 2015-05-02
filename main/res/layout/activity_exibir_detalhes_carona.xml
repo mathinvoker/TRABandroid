@@ -1,0 +1,159 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.example.lucas.easyride.ExibirDetalhesCarona">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/detalhesCarona"
+        android:id="@+id/rideDetailsTV"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/departureCity"
+        android:id="@+id/departureCityTV"
+        android:layout_below="@+id/cadastroCaronaTV"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="40dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/departureAddress"
+        android:id="@+id/departureAddressTV"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/departureCityTV"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/destinationCity"
+        android:id="@+id/destinationCityTV"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/departureAddressTV"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/destinationAddress"
+        android:id="@+id/destinationAddressTV"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/destinationCityTV"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/departureCity"
+        android:layout_alignBottom="@+id/departureCityTV"
+        android:layout_toRightOf="@+id/departureCityTV" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/departureAddress"
+        android:layout_alignBottom="@+id/departureAddressTV"
+        android:layout_toRightOf="@+id/departureAddressTV" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/destinationCity"
+        android:layout_alignBottom="@+id/destinationCityTV"
+        android:layout_toRightOf="@+id/destinationCityTV" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/destinationAddress"
+        android:layout_alignBottom="@+id/destinationAddressTV"
+        android:layout_toRightOf="@+id/destinationAddressTV" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/voltar"
+        android:id="@+id/back"
+        android:onClick="Voltar"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/data"
+        android:id="@+id/dateTV"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/destinationAddress"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"  />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/hora"
+        android:id="@+id/timeTV"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/dateTV"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/seatsAvailable"
+        android:id="@+id/seatsAvailableTV"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/timeTV"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/date"
+        android:layout_alignBottom="@+id/dateTV"
+        android:layout_toRightOf="@+id/dateTV" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="time"
+        android:ems="10"
+        android:id="@+id/time"
+        android:layout_alignBottom="@+id/timeTV"
+        android:layout_toRightOf="@+id/dateTV" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/seatsAvailable"
+        android:layout_alignBottom="@+id/seatsAvailableTV"
+        android:layout_toRightOf="@+id/seatsAvailableTV" />
+</RelativeLayout>

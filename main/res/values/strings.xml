@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">EasyRide</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login_usuario">LoginUsuario</string>
+    <string name="title_activity_tela_principal">TelaPrincipal</string>
+    <string name="title_activity_cadastro_carona">CadastroCarona</string>
+    <string name="title_activity_cadastro_usuario">CadastroUsuario</string>
+    <string name="title_activity_tela_confirmacao">TelaConfirmacao</string>
+    <string name="title_activity_buscar_carona">BuscarCarona</string>
+    <string name="title_activity_listar_caronas">ListarCaronas</string>
+    <string name="title_activity_avaliar_carona">AvaliarCarona</string>
+    <string name="title_activity_exibir_detalhes_carona">ExibirDetalhesCarona</string>
+
+    <string name="avaliar">Avaliar</string>
+    <string name="avaliacao">Avaliação:</string>
+    <string name="selecioneCarona">Selecione a carona para avaliar</string>
+    <string name="buscarCarona">Buscar Carona</string>
+    <string name="departureCity">Cidade de Origem:</string>
+    <string name="destinationCity">Cidade de Destino:</string>
+    <string name="data">Data da Saída:</string>
+    <string name="hora">Hora da Saída:</string>
+    <string name="buscar">Buscar</string>
+    <string name="cadastrarCarona">Cadastrar uma nova carona</string>
+    <string name="departureAddress">Endereço de Origem:</string>
+    <string name="destinationAddress">Endereço de Destino:</string>
+    <string name="cadastrar">Cadastrar</string>
+    <string name="seatsAvailable">Número de vagas:</string>
+    <string name="cadastroUsuario">Cadastro de Usuário</string>
+    <string name="nome">Nome:</string>
+    <string name="idade">Idade:</string>
+    <string name="password">Senha:</string>
+    <string name="email">E-mail</string>
+    <string name="whatsapp">WhatsApp:</string>
+    <string name="detalhesCarona">Detalhes da Carona</string>
+    <string name="voltar">Voltar</string>
+    <string name="login">Login:</string>
+    <string name="entrar">Entrar</string>
+    <string name="usuarioSemCadastro">Você ainda não possui cadastro?</string>
+    <string name="avaliarCarona">Avaliar Carona</string>
+    <string name="menu">Menu</string>
+
+</resources>
