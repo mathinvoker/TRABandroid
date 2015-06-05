@@ -1,0 +1,45 @@
+public void falar() {
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "pt-BR");
+
+        try {
+            startActivityForResult(intent, RESULT_SPEECH);
+
+        } catch (ActivityNotFoundException a) {
+            Toast t = Toast.makeText(getApplicationContext(),
+                    "Opps! Your device doesn't support Speech to Text",
+                    Toast.LENGTH_SHORT);
+            t.show();
+        }
+}
+
+@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+ 
+        switch (requestCode) {
+        case RESULT_SPEECH: {
+            if (resultCode == RESULT_OK && null != data) {
+ 
+                ArrayList<String> text = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+
+                int indice = comparar(text.get(0));
+                if(indice == -1) {
+                	  tts.speak("Desculpe, não entendi o que você falou. Diga novamente", TextToSpeech.QUEUE_ADD, null);
+                	  while(tts.isSpeaking());
+                	  falar();
+                }
+                else {
+                	 Intent it = new Intent(this, PrincipalAcessibilidade.class);
+                	 Log.i("teste", "linha: " + LINHAS[indice]);
+                	 it.putExtra("nome", LINHAS[indice]);
+                	 startActivity(it);
+                }
+            }
+            break;
+        }
+ 
+        }
+    }

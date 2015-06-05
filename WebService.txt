@@ -1,0 +1,362 @@
+//WebService deve retornar um elemento json
+//Exemplo do web service
+
+<?php 
+$conecta = mysql_connect("localhost", "user", "senha") or print (mysql_error()); 
+//print "Conexao OK!"; 
+mysql_select_db("BD", $conecta) or print(mysql_error()); 
+//print "Conexao e Selecao OK!"; 
+ 
+
+//Recepera os elementos do urlParameters
+$dia = $_POST['dia'];
+$refeicao= $_POST['refeicao'];
+$restaurante= $_POST['restaurante'];
+
+//Faz a pesquisa no banco de dados
+$sql = "SELECT C.diaSemana, C.restaurante, C.data, P.tipoRefeicao, R.tipo, R.nome  FROM cardapios AS C, pratos AS P, refeicoes AS R, prato_refeicoes AS PR 
+WHERE R.idRefeicao = PR.idRefeicao AND P.idPrato = PR.idPrato AND C.pratos_idPrato = P.idPrato 
+AND P.tipoRefeicao = '".$refeicao."' AND C.diaSemana = '".$dia."' AND C.restaurante = '".$restaurante."'";
+
+$result = mysql_query($sql, $conecta); 
+
+//$cardapio['diaSemana'] = $dia;
+//$cardapio['tipoPrato'] = $tipo;
+
+//cria o arquivo json para retornar ele para o app mobile
+while($consulta = mysql_fetch_array($result)) {
+      $cardapio[$consulta['tipo']] = $consulta['nome'];
+}
+
+if($cardapio == null)
+  $cardapio['imprime'] = "false";  
+ 
+mysql_free_result($result); 
+
+mysql_close($conecta);
+
+echo json_encode($cardapio);
+
+?>
+
+//Exemplo de chaamda ddo web service
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Locale;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+
+public class CardapioRU extends ActionBarActivity implements TextToSpeech.OnInitListener {
+
+  String rest;
+  String ref;
+  String diaTela[] = new String[] {"Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sabado", "Domingo"};
+  String diaBanco[] = new String[] {"Segunda", "Terca", "Quarta", "Quinta", "Sexta", "Sabado", "Domingo"};
+  int diaSemana;
+  String carne, guarnicao, salada, sobremesa, mingau, fruta;
+  
+  //criando as variáveis de tts e uma String com a mensagem que será falada.
+  private TextToSpeech tts;
+  String msg;
+  private final String nomeArquivo = "auxilioAudio";
+  
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_cardapio_ru);
+
+    if (savedInstanceState == null) {
+      getSupportFragmentManager().beginTransaction()
+          .add(R.id.container, new PlaceholderFragment()).commit();
+    }
+    Log.d("RU logs", "Iniciou On Create Cardapio RU");
+    Intent it = getIntent();
+    rest = it.getStringExtra("rest");
+    ref = it.getStringExtra("ref");
+    diaSemana = it.getIntExtra("dia", 0);
+    
+    Log.d("RU logs", rest + " " + ref + " " + diaSemana + diaTela[diaSemana]);
+    //Aqui é atribuído o que queremos que seja dito na msg e o tts é inicializado
+    File f = getFileStreamPath(nomeArquivo);
+    if(f.exists()){
+      msg = "Você está no Cardapio RU";
+      tts = new TextToSpeech(this, this);
+      int i = 0;
+      while ( i != 1500){
+        i++;
+      }
+    }
+    
+    String refeicao = " ";
+    if(ref.equals("Almoco"))
+      refeicao = "Almoço";
+    else
+    if(ref.equals("Cafe"))
+      refeicao = "Café";
+    else
+    if(ref.equals("Janta"))
+      refeicao = "Janta";
+    
+    Log.d("RU logs", "A tela com as informações do Restaurante, Dia e Refeição");
+    TextView info = (TextView) findViewById(R.id.txt_info);
+    info.setText("Restaurante: " + rest + ".\nDia da semana: " + diaTela[diaSemana] + ".\nRefeição: " + refeicao +".");
+    
+    Log.d("RU logs", "Começou a busca de informações no BD");
+    //Inicia processamento demorado no background com tela de espera
+    
+    Log.d("RU logs", "Chamando Async");
+    //Determinar os parametros que devem ser recuperar no metodo post no web serice(id + elemento a ser recuperado)
+    String urlParameters = "dia=" + diaBanco[diaSemana]  + "&refeicao=" + ref + "&restaurante=" + rest;
+    //chamada a função que faz conexao com o banco de dados e interpreta o json
+    new SendMessageAsync().execute(urlParameters);
+    
+  }
+
+  
+  //função de inicialização que DEVE ser implementada (nesse caso já está implementada)
+    //note que Locale.getDefault() pega o idioma default, caso queira trocar, aperte ctrl+espaço no ponto e veja as opções
+  @Override
+    public void onInit(int status) {
+
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.getDefault());
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+                tts.speak(msg, TextToSpeech.QUEUE_FLUSH, null);
+            }
+
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+
+    }
+
+  //também não podemos esquecer de "terminar" a variável tts na função onDestroy
+  @Override
+    public void onDestroy() {
+
+        // Don't forget to shutdown tts!
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+  
+  
+  
+  
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.cardapio_ru, menu);
+    return true;
+  }
+//--------------------------------------------------------------------------------------------
+//Função que faz toda a logica com o web service
+  // AsyncTask to send the message to server
+      private class SendMessageAsync extends AsyncTask<String, Void, Integer> {
+        private JSONObject json;
+        private ProgressDialog _dialog;
+
+          @Override
+          protected void onPreExecute() {          
+              super.onPreExecute();
+              _dialog = new ProgressDialog(getActivity());     
+              _dialog.setCancelable(false);
+              _dialog.setTitle("Informações do Cardápio");
+              //((ProgressDialog)dialog).setIcon(R.drawable.icon);
+              _dialog.setMessage("Carregando informações\nAguarde um momento...");
+              _dialog.setIndeterminate(false);         
+              _dialog.show();
+              //ProgressBar_show();
+              Log.d("RU logs", "Executando PreExecute, iniciando tela de loading" );
+          }
+
+        @Override
+        protected Integer doInBackground (String... params) {
+          ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+          NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+          Log.d("RU logs", "Testando se está conectado a alguma rede de internet");
+          if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d("RU logs", "Está conectado");
+                try {
+                  URL url = new URL("Endereço do webservice online");
+                  Log.d("RU logs", "Setando Url do web service");
+                  String cardapio = POSTConnection (params[0], url);
+                  Log.d("RU logs", "String com json encode do cardapio \n"+cardapio);
+                  if(cardapio != null)
+                    json = new JSONObject(cardapio);
+                  Log.d("RU logs", "Guardou a String retornada na variavel json");
+                  return 1;
+                } catch (Exception e) {
+                  Log.e("SendMessageException", e.toString());
+                  return -1;
+                }
+            } else {
+              return -3;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+          Log.d("RU logs", "Iniciou PostExecute");
+          Intent it = getIntent();
+          ref = it.getStringExtra("ref");
+          
+          TextView cardapio = (TextView) findViewById(R.id.txt_cardapio);
+          //mostra o resultado
+          try {
+            if(ref.equals("Almoco")){
+                cardapio.setText("Carne: "+ json.getString("Carne")+".\nGuarnição: "+json.getString("Guarnicao")+
+                ".\nSalada: "+ json.getString("Salada")+".\nSobremesa: "+json.getString("Sobremesa")+".\nSuco: Refresco");
+                Log.d("RU logs", "Exibiu o Almoço");
+            }
+            else{
+            if(ref.equals("Cafe")){
+              cardapio.setText("Mingau: "+json.getString("Mingau"));
+              Log.d("RU logs", "Exibiu o Café");
+            }
+            else{
+            if(ref.equals("Janta")){
+              cardapio.setText("Carne: "+ json.getString("Carne")+".\nGuarnição: "+json.getString("Guarnicao")+
+              ".\nSalada: "+ json.getString("Salada")+".\nSobremesa: "+json.getString("Sobremesa")+".\nSuco: Refresco"+ 
+              ".\n\nAnternativo: \nPão.\nFruta: "+json.getString("Fruta")+".\nGuarnição: "+json.getString("Guarnicao")+
+              ".\nSobremesa: "+json.getString("Sobremesa")+".\nSuco: Refresco");
+              Log.d("RU logs", "Exibiu a Janta");
+            }
+            }
+            }            
+          } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            Log.d("RU logs", "Não tinha nada no BD de acordo com os parametros de busca");
+            cardapio.setText("Não temos informações sobre o cardapio dessa refeição nesse dia");
+            //e.printStackTrace();
+          }
+          //Toast.makeText(CardapioRU.this, "Cardapio! - /n" + json.toString(), Toast.LENGTH_LONG).show();
+          /*try {
+            Toast.makeText(MainActivity.this, "Valeu Ramos! - " + json.getString("diaSemana"), Toast.LENGTH_SHORT).show();
+          } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }*/
+          _dialog.dismiss();
+          falaMulher();
+          Log.d("RU logs", "Terminou execução do loading");
+        }
+      }
+      
+      // Function to make the POST request to the server and send a message
+      private String POSTConnection (String urlParameters, URL url) throws Exception{
+
+        //Connection parameters
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+          conn.setDoOutput(true);
+          conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+          conn.setRequestProperty("charset", "utf-8");
+
+          //Send request
+        DataOutputStream wr = new DataOutputStream (conn.getOutputStream ());
+        wr.writeBytes (urlParameters);
+        wr.flush ();
+        wr.close ();
+
+        //Get Response  
+          InputStream is = conn.getInputStream();
+          BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+          String line;
+          StringBuffer response = new StringBuffer(); 
+          while((line = rd.readLine()) != null) {
+            response.append(line);
+            response.append('\r');
+          }
+          rd.close();
+          Log.d("RU logs", "Buscou no bando de dados externos as informações e retornou como uma String");
+          return response.toString();
+      }
+  
+  
+  public void falaMulher(){
+    File f = getFileStreamPath(nomeArquivo);
+    if(f.exists()){
+      int i = 0;
+      while ( i != 1500){
+        i++;
+      }
+      String msg1;
+      TextView info = (TextView) findViewById(R.id.txt_info);
+      TextView cardapio = (TextView) findViewById(R.id.txt_cardapio);
+      msg1 = info.getText().toString() + cardapio.getText().toString();
+      msg = msg1;
+      tts = new TextToSpeech(this, this);
+    }
+  }
+  
+  public Context getActivity() {
+        // TODO Auto-generated method stub
+        return this;
+      }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+    int id = item.getItemId();
+    if (id == R.id.action_settings) {
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  /**
+   * A placeholder fragment containing a simple view.
+   */
+  public static class PlaceholderFragment extends Fragment {
+
+    public PlaceholderFragment() {
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        Bundle savedInstanceState) {
+      View rootView = inflater.inflate(R.layout.fragment_cardapio_ru,
+          container, false);
+      return rootView;
+    }
+  }
+
+}
